@@ -25,7 +25,7 @@ az ad sp create-for-rbac -n "MyApp-no-roles" --skip-assignment
 We can aasign roles to the Service Principal:
 
 ```bash
-az role assignment create --role "Owner" --assignee "Jhon.Doe@Contoso.com" 
+az role assignment create --role "Owner" --assignee "Jhon.Doe@Contoso.com" --scope $id
 ```
 
 Let's create a Service Priincipal with role Contributor and assign the role to scopes which are 2 resource groups:
@@ -37,7 +37,7 @@ az ad sp create-for-rbac -n "MyApp" --role Contributor --scopes /subscriptions/{
 Login to Azure using SPN:
 
 ```bash
-az login --service-principal -u <app-name-or-url> -p <password-or-cert> --tenant <tenant>
+az login --service-principal --username APP_ID --password PASSWORD --tenant TENANT_ID
 ```
 
 --years
@@ -46,3 +46,8 @@ Number of years for which the credentials will be valid. Default: 1 year.
 ```bash
 az ad sp delete --id 00000000-0000-0000-0000-000000000000
 ```
+
+More details:
+https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest
+https://docs.microsoft.com/en-us/cli/azure/role/assignment?view=azure-cli-latest
+https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli#sign-in-with-a-service-principal
