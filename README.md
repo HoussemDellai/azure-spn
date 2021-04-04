@@ -1,6 +1,8 @@
 # azure-spn
 Demoing Azure Service Principal (SPN) with RBAC.
 
+This workshop is using Bash in Azure Cloud Shell.
+
 ```bash
 az ad sp create-for-rbac -n "MyApp"
 
@@ -16,16 +18,42 @@ Creating 'Contributor' role assignment under scope '/subscriptions/17b12858-xxxx
 }
 ```
 
-By default, this command (_az ad sp create-for-rbac_) assigns the 'Contributor' role to the service principal at the subscription scope. To reduce your risk of a compromised service principal, use --skip-assignment to avoid creating a role assignment, then assign a more specific role and narrow the scope to a resource or resource group. 
+By default, this command (_az ad sp create-for-rbac_) assigns the 'Contributor' role to the service principal at the subscription scope.
+
+Check your Azure subscription from portal, under Access control (IAM), Role assignments, and you should see the SPn have now Contributor role over your subscription.
+
+To reduce your risk of a compromised service principal, use --skip-assignment to avoid creating a role assignment, then assign a more specific role and narrow the scope to a resource or resource group. 
+
+Lets first create the SPN with no assignments and no roles:
 
 ```bash
-az ad sp create-for-rbac -n "MyApp-no-roles" --skip-assignment
+az ad sp create-for-rbac -n "MySPN" --skip-assignment
 ```
 
-We can aasign roles to the Service Principal:
+Later we'll need the SPN credentials, to make it easier to get these, we'll use environment variables:
 
 ```bash
-az role assignment create --role "Owner" --assignee "Jhon.Doe@Contoso.com" --scope $id
+SPN=$(az ad sp create-for-rbac -n "MySPN" --skip-assignment -o json)
+```
+
+Then let's display the credentials using jq tool, which is already installed in Azure Cloud Shell, to display the SPN and to extract some specific fields like appId:
+
+```bash
+echo $SPN | jq
+echo $SPN | jq -r '.appId'
+```
+
+We can aasign roles to the Service Principal either using the Azure Portal or using the Azure CLI. 
+
+With the first solution, from the Azure portal you can navigate to your resource (resource group for example), then Access control (IAM), Role assignments and then you can assign a role (like Reader) to your SPN (search with your SPN name).
+
+The second solution is using command line:
+
+```bash
+SCOPE="/subscriptions/<YOU_SUBSCRIPTION_ID>/resourceGroups/<YOUR_RG>"
+az role assignment create --role Contributor \
+                          --assignee $(echo $SPN | jq -r '.appId') \
+                          --scope $SCOPE
 ```
 
 Let's create a Service Priincipal with role Contributor and assign the role to scopes which are 2 resource groups:
