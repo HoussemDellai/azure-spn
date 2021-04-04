@@ -7,7 +7,8 @@ This workshop is using Bash in Azure Cloud Shell.
 az ad sp create-for-rbac -n "MyApp"
 
 Changing "MyApp" to a valid URI of "http://MyApp", which is the required format used for service principal names
-In a future release, this command will NOT create a 'Contributor' role assignment by default. If needed, use the --role argument to explicitly create a role assignment.
+In a future release, this command will NOT create a 'Contributor' role assignment by default. 
+If needed, use the --role argument to explicitly create a role assignment.
 Creating 'Contributor' role assignment under scope '/subscriptions/17b12858-xxxx-xxxx-xxxx-a06fdae23428'
 {
   "appId": "ced608dc-xxxx-4c22-835f-9379363e0d50",
@@ -67,7 +68,9 @@ Now you can check the Access control (IAM) in your resource group from Azure por
 Note that you can also create a Service Principal with role Contributor and assign the role to multiple resources like 2 resource groups at once:
 
 ```bash
-az ad sp create-for-rbac -n "MyApp" --role Contributor --scopes /subscriptions/{SubID}/resourceGroups/{ResourceGroup1} /subscriptions/{SubID}/resourceGroups/{ResourceGroup2}
+az ad sp create-for-rbac -n "MyApp" 
+                         --role Contributor 
+                         --scopes /subscriptions/{SubID}/resourceGroups/{ResourceGroup1} /subscriptions/{SubID}/resourceGroups/{ResourceGroup2}
 ```
 
 Note alse thay you can use the parameter **--years** as number of years for which the credentials will be valid. Default: 1 year.
