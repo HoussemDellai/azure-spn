@@ -47,32 +47,53 @@ We can aasign roles to the Service Principal either using the Azure Portal or us
 
 With the first solution, from the Azure portal you can navigate to your resource (resource group for example), then Access control (IAM), Role assignments and then you can assign a role (like Reader) to your SPN (search with your SPN name).
 
-The second solution is using command line:
+The second solution is using command line. We'll create a new resource group.
 
 ```bash
-SCOPE="/subscriptions/<YOU_SUBSCRIPTION_ID>/resourceGroups/<YOUR_RG>"
+az group create -n spn-demo2-rg
+SCOPE="/subscriptions/<YOU_SUBSCRIPTION_ID>/resourceGroups/spn-demo2-rg"
+```
+
+Then we use the resource group to assign role Contributor for the SPN:
+
+```bash
 az role assignment create --role Contributor \
                           --assignee $(echo $SPN | jq -r '.appId') \
                           --scope $SCOPE
 ```
 
-Let's create a Service Priincipal with role Contributor and assign the role to scopes which are 2 resource groups:
+Now you can check the Access control (IAM) in your resource group from Azure portal.
+
+Note that you can also create a Service Principal with role Contributor and assign the role to multiple resources like 2 resource groups at once:
 
 ```bash
 az ad sp create-for-rbac -n "MyApp" --role Contributor --scopes /subscriptions/{SubID}/resourceGroups/{ResourceGroup1} /subscriptions/{SubID}/resourceGroups/{ResourceGroup2}
 ```
 
+Azure users typically uses their Identity (email and password) to connect to Azure. But machines (like DevOps build agents) will use the SPN.
+
 Login to Azure using SPN:
 
 ```bash
-az login --service-principal --username APP_ID --password PASSWORD --tenant TENANT_ID
+az login --service-principal --username $(echo $SPN | jq -r '.appId') \
+                             --password $(echo $SPN | jq -r '.password') \
+                             --tenant   $(echo $SPN | jq -r '.tenant')
+```
+
+Now if we try to get the resource groups we'll see only the one with SPN assigned:
+
+```bash
+az group list -o table
+Name          Location    Status
+------------  ----------  ---------
+spn-demo2-rg  westeurope  Succeeded
 ```
 
 --years
 Number of years for which the credentials will be valid. Default: 1 year.
 
 ```bash
-az ad sp delete --id 00000000-0000-0000-0000-000000000000
+az ad sp delete --id $(echo $SPN | jq -r '.appId')
 ```
 
 More details:
