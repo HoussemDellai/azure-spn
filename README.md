@@ -70,6 +70,8 @@ Note that you can also create a Service Principal with role Contributor and assi
 az ad sp create-for-rbac -n "MyApp" --role Contributor --scopes /subscriptions/{SubID}/resourceGroups/{ResourceGroup1} /subscriptions/{SubID}/resourceGroups/{ResourceGroup2}
 ```
 
+Note alse thay you can use the parameter **--years** as number of years for which the credentials will be valid. Default: 1 year.
+
 Azure users typically uses their Identity (email and password) to connect to Azure. But machines (like DevOps build agents) will use the SPN.
 
 Login to Azure using SPN:
@@ -89,8 +91,13 @@ Name          Location    Status
 spn-demo2-rg  westeurope  Succeeded
 ```
 
---years
-Number of years for which the credentials will be valid. Default: 1 year.
+To login back to Azure CLI using your personal identity, just use 
+
+```bash
+az login
+```
+
+Finally, we'll got to delete the SPN we used here.
 
 ```bash
 az ad sp delete --id $(echo $SPN | jq -r '.appId')
